@@ -31,10 +31,14 @@ export default class Ant {
   }
 
   wander() {
-    // Jagged / zigzag wandering pattern
+    // wandering pattern
+    
     if (!this.wanderTarget || Math.random() < 0.1) {
-      // 5% chance per frame to pick a new random direction, creating sharp turns
+      // Math.random() < 0.1 ensures there's 1% chance per frame to pick a new random direction, creating sharp turns
+
+      // We don't want to turn too much in one frame so limiting the turn angle.
       let angle = this.vel.heading() + (Math.random() - 0.5) * Math.PI * 1.5;
+      // Random distance to wander between 20 to 60 pixels
       let dist = 20 + Math.random() * 40;
       let offset = new Vector(Math.cos(angle) * dist, Math.sin(angle) * dist);
       this.wanderTarget = this.pos.copy().add(offset);
@@ -57,7 +61,7 @@ export default class Ant {
     let d = desired.mag();
     desired.normalize();
 
-    // Add noise for variation
+    // Add noise for variation, looks cool
     let noise = Vector.random2D().mult(0.5);
     desired.add(noise).normalize();
 
@@ -92,6 +96,7 @@ export default class Ant {
       hitEdge = true;
     }
 
+    // Boundary detection
     if (hitEdge) {
       // Turn around and add a random angle offset between -90 and 90 degrees
       let currentHeading = this.vel.heading();
@@ -105,7 +110,8 @@ export default class Ant {
 
   draw(ctx) {
     // Draw simple dot without expensive transformations
-    ctx.fillStyle = '#60a5fa';
+    // TODO - Try creating an ant like figure, maybe add an epplise body to the current circle head. and a few line legs
+    ctx.fillStyle = '#5fbfffff';
     ctx.beginPath();
     ctx.arc(this.pos.x, this.pos.y, 2, 0, Math.PI * 2);
     ctx.fill();
@@ -114,8 +120,9 @@ export default class Ant {
   sensePheromone(pixels, width, height) {
     if (!pixels) return false;
 
-    let sensorAngle = Math.PI / 4; // 45 degrees
-    let sensorDist = 25; // Distance to look ahead
+    let sensorAngle = Math.PI / 4;
+    // Distance to look ahead
+    let sensorDist = 25;
 
     let centerAngle = this.vel.heading();
     let leftAngle = centerAngle - sensorAngle;
@@ -139,7 +146,7 @@ export default class Ant {
       let y = Math.floor(pos.y);
       if (x < 0 || x >= width || y < 0 || y >= height) return 0;
       let index = (y * width + x) * 4;
-      return pixels[index]; // Return Red channel
+      return pixels[index];
     };
 
     let centerWeight = getRed(centerPos);
@@ -171,7 +178,7 @@ export default class Ant {
   }
 
   dropPheromone(ctx) {
-    // Only drop if moved far enough, to create segments
+    // Only drop if moved far enough
     if (this.pos.dist(this.lastPheromonePos) > this.pheromoneDropDist) {
       ctx.beginPath();
       ctx.moveTo(this.lastPheromonePos.x, this.lastPheromonePos.y);
@@ -179,7 +186,7 @@ export default class Ant {
 
       if (this.state === 1) { // Returning with food
         ctx.strokeStyle = 'rgba(239, 68, 68, 0.2)'; // Red trail, low opacity
-        ctx.lineWidth = 2 + Math.random(); // 2-3 px slight variation
+        ctx.lineWidth = 2 + Math.random(); // slight variation for asthetics
         ctx.stroke();
       } else { // Wandering
         ctx.strokeStyle = 'rgba(56, 189, 248, 0.02)'; // Very faint blue trail

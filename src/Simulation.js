@@ -17,7 +17,7 @@ export default class Simulation {
 
   initFoods() {
     this.foods = [];
-    // Start with empty foods or a few random ones. Let's keep a couple random ones initially to show it's working.
+    // Start with a few random ones.
     for (let i = 0; i < 3; i++) {
       let x = this.width * 0.1 + Math.random() * this.width * 0.8;
       let y = this.height * 0.1 + Math.random() * this.height * 0.8;
@@ -58,9 +58,10 @@ export default class Simulation {
         if (targetFood && ant.pos.dist(targetFood.pos) < 20) {
           ant.state = 1; // Got food, return to nest
           ant.vel.mult(-1); // Turn around
-          targetFood.amount -= 2; // Deplete food slightly faster
+          targetFood.amount -= 2; // Deplete food
         }
       } else { // Returning to nest
+        // TODO - Try adding obstacles on the way back home
         ant.arrive(this.nest);
         
         // Check nest collision
@@ -93,7 +94,7 @@ export default class Simulation {
   }
 
   draw(ctx) {
-    // Draw graph connections between foods (subtle indication)
+    // graph connections between foods
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -112,7 +113,7 @@ export default class Simulation {
 
     // Draw foods
     for (let food of this.foods) {
-      ctx.fillStyle = '#10b981'; // Emerald glow
+      ctx.fillStyle = '#10b981'; // Meh color!!! Improve asthetics of it
       ctx.shadowBlur = 20;
       ctx.shadowColor = '#10b981';
       ctx.beginPath();
@@ -122,14 +123,14 @@ export default class Simulation {
     }
     
     // Draw nest
-    ctx.fillStyle = '#8b5cf6'; // Violet glow
+    ctx.fillStyle = '#ecef3cff'; // Looks ok i think
     ctx.shadowBlur = 30;
-    ctx.shadowColor = '#8b5cf6';
+    ctx.shadowColor = '#ecef3cff';
     ctx.beginPath();
     ctx.arc(this.nest.x, this.nest.y, 25, 0, Math.PI * 2);
     ctx.fill();
 
-    // Reset shadowBlur before drawing ants!
+    // Reset shadowBlur before drawing ants! Blur is too costly it seems, making the animation lag a lot
     ctx.shadowBlur = 0;
     
     // Draw ants

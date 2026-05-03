@@ -133,7 +133,7 @@ mainCanvas.addEventListener('mouseleave', () => {
 });
 
 function animate() {
-  // Evaporate pheromones using destination-out
+  // Evaporate pheromones using destination-out, draw behind ants.
   pheromoneCtx.globalCompositeOperation = 'destination-out';
   // Fill screen with low-opacity black to slowly erase trails
   pheromoneCtx.fillStyle = `rgba(0, 0, 0, ${evaporationRate * speed})`;
@@ -146,10 +146,12 @@ function animate() {
   const imgData = pheromoneCtx.getImageData(0, 0, width, height);
   const pixels = imgData.data;
   
-  // Determine how many steps to simulate this frame based on speed
+  // Determine how many steps to simulate this frame based on speed.
+  // Don't know what's happening here!!!
   const steps = Math.floor(speed);
   const remainder = speed - steps;
   
+  // Spawn ants
   if (isMouseDown && placementMode === 'ants' && simulation) {
     for (let i = 0; i < 2; i++) { // Spawn a couple per frame while held
       simulation.addAnt(mouseX + (Math.random() - 0.5) * 10, mouseY + (Math.random() - 0.5) * 10);
